@@ -39,6 +39,23 @@ describe("installer module", () => {
         }
         return parts.slice(0, 3).join(".");
       };
+
+      expect(normalize("0")).toBe("0.0.0");
+      expect(normalize("0.2")).toBe("0.2.0");
+      expect(normalize("0.2.2")).toBe("0.2.2");
+      expect(normalize("1.0.0")).toBe("1.0.0");
+    });
+  });
+
+  describe("platform mappings", () => {
+    it("should have correct platform mappings", () => {
+      const platformMap: Record<string, string> = {
+        linux: "Linux",
+        darwin: "macOS",
+        win32: "Windows",
+      };
+
+      expect(platformMap["linux"]).toBe("Linux");
       expect(platformMap["darwin"]).toBe("macOS");
       expect(platformMap["win32"]).toBe("Windows");
     });
