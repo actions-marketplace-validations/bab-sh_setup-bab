@@ -1,0 +1,81 @@
+name: Integration Tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Test (${{ matrix.os }}, ${{ matrix.version }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-24.04
+          - macos-14
+          - windows-2022
+        version:
+          - 'latest'
+          - '0.x'
+          - '0.2.2'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup bab
+        id: setup-bab
+        uses: ./
+        with:
+          version: ${{ matrix.version }}
+
+      - name: Verify installation
+        run: bab --version
+
+      - name: Check outputs
+        shell: bash
+        run: |
+          echo "Installed version: ${{ steps.setup-bab.outputs.version }}"
+          echo "Installation path: ${{ steps.setup-bab.outputs.path }}"
+
+          if [ -z "${{ steps.setup-bab.outputs.version }}" ]; then
+            echo "::error::Version output is empty"
+            exit 1
+          fi
+
+          if [ -z "${{ steps.setup-bab.outputs.path }}" ]; then
+            echo "::error::Path output is empty"
+            exit 1
+          fi
+
+  test-cache:
+    name: Test caching
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup bab (first run)
+        uses: ./
+        with:
+          version: 'latest'
+
+      - name: Verify first installation
+        run: bab --version
+
+      - name: Setup bab (second run - should use cache)
+        uses: ./
+        with:
+          version: 'latest'
+
+      - name: Verify cached installation
+        run: bab --version

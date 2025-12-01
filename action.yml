@@ -1,0 +1,27 @@
+name: 'Setup Bab'
+description: 'Download and install bab CLI, adding it to PATH'
+author: 'bab-sh'
+
+branding:
+  icon: 'terminal'
+  color: 'purple'
+
+inputs:
+  version:
+    description: 'Version of bab to install (e.g., "latest", "0.x", "0.2.x", "0.2.2")'
+    required: false
+    default: 'latest'
+  repo-token:
+    description: 'GitHub token for API requests (reduces rate limiting)'
+    required: false
+    default: ${{ github.token }}
+
+outputs:
+  version:
+    description: 'The exact version of bab that was installed'
+  path:
+    description: 'Path where bab was installed'
+
+runs:
+  using: node20
+  main: 'dist/index.js'
