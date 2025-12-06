@@ -84,7 +84,3 @@ steps:
 | Linux   | x64, arm64, arm |
 | macOS   | x64, arm64      |
 | Windows | x64             |
-
-## License
-
-MIT
